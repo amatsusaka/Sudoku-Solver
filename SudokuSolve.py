@@ -3,6 +3,7 @@
 from math import sqrt
 import copy
 import sys
+import time
 
 #File read file from grid
 def ReadGridFromFile( filename ):
@@ -18,6 +19,21 @@ def ReadGridFromFile( filename ):
 				grid[currRow].append( valInt )
 		currRow = currRow + 1
 	return grid
+	
+#Checks a grid at certain coordinates and list its possibile values
+#RETURNS: list of possible values for coords
+def FindPsbs( grid, x, y ):
+	psbs = []
+	
+	col = ColToArray( grid, y )
+	block = BlockToArray( grid, LocateBlock( [x, y], sqrt( len( grid ) ) ) )
+
+	for i in range( 1, len( grid ) + 1 ):
+		if i not in grid[x]:
+			if i not in col:
+				if i not in block:
+					psbs.append( i )
+	return psbs
 
 #Checks for duplicates within the array
 #RETURNS: False if row is valid
@@ -176,9 +192,14 @@ def TestBlockToArray():
 	
 def TestLocateNextEmpty():
 	failed = True
-	grid = ReadGridFromFile('TestCase1.txt')
-	val = LocateNextEmpty( grid )
-	if val == [1,0]:
+	a = [
+		[1, 2, 3, 4],
+		[5, 6, 7, 8],
+		[9, 10, 0, 12],
+		[13, 14, 15, 16]
+		]
+	val = LocateNextEmpty( a )
+	if val == [2,2]:
 		failed = False
 	return failed
 	
@@ -212,8 +233,31 @@ def BigTest():
 ########################################
 
 def PrintGrid( grid ):
-	for row in grid:
-		print row
+	linePrint = []
+	for k in range( 0, len( grid ) ):
+		linePrint.append( '-----' )
+		
+	for i in range( 0, len( grid ) ):
+		#print grid[i]
+		if i % sqrt( len( grid ) ) == 0:
+			print ''.join( linePrint )
+		CleanRowPrint( i, grid[i] )
+	print ''.join( linePrint )
+		
+def CleanRowPrint( rowNum, array ):
+	cleanPrint = []
+	for i in range( 0, len( array ) ):
+		if i % sqrt( len( array ) ) == 0:
+			cleanPrint.append( "| " )
+		val = array[i]
+		if val > 9:
+			cleanPrint.append( str( val ) )
+		else:
+			cleanPrint.append( str( val ) )
+			cleanPrint.append( ' ' )
+	cleanPrint.append( "| " )
+	#print "%d: [ %s ]" % (rowNum, ' '.join( cleanPrint ) )
+	print ' '.join( cleanPrint )
 		
 def ValidateGrid( grid, x, y ):
 	#Checking row
@@ -229,34 +273,80 @@ def ValidateGrid( grid, x, y ):
 	
 	return check
 
+#Generates a grid that contains the possibilities
+#for each cell
+#RETURN: possibility grid
+def CreatePsbGrid( grid ):
+	psb = []
+	for x in range( 0, len( grid ) ):
+		psb.append( [] )
+		for y in range( 0, len( grid ) ):
+			possibles = []
+			if grid[x][y] == 0:
+				possibles = FindPsbs( grid, x, y )
+			psb[x].append( possibles )
+	return psb
+
+psbGrid = []
 solutions = []
+
+#Updates the possibility grid with the new value
+def UpdatePsb( x, y, val ):
+	global psbGrid
+	
+	#print "Updating (%d, %d) with (%d)." % (x, y, val)
+	#CleanRowPrint( x, grid[x] )
+	
+	#cleaning out the filled cell
+	if val != 0:
+		psbGrid[x][y] = []
+	for cell in psbGrid[x]:
+		if val in cell:
+			cell.remove( val )
+			
+	column = ColToArray( psbGrid, y )
+	for cell in column:
+		if val in cell:
+			cell.remove( val )
+	
+	blockNum = LocateBlock( [x,y], sqrt( len( psbGrid ) ) )
+	block = BlockToArray( psbGrid, blockNum )
+	for cell in block:
+		if val in cell:
+			cell.remove( val )
+	
+	#print psbGrid
 
 #Recursive function to fill grid
 def FillGrid( grid, val ):
+	global psbGrid
+	
 	nextCoord = LocateNextEmpty( grid )
 	x = nextCoord[0]
 	y = nextCoord[1]
-	
-	#Base cases
-	if x == -1:
-		global solutions
-		solutions.append( grid )
-		return True
 		
 	grid[x][y] = val
-	
-	print "Attempting to add: %d" % val
-	PrintGrid( grid )
+	undoGrid = copy.deepcopy( psbGrid )
+	UpdatePsb( x, y, val )
 	
 	check = ValidateGrid( grid, x, y )
 	if check == True:
-		for i in range( 1, len( grid ) + 1 ):
-			#print "%d: On the iteration %d..." % (val,i)
-			check = FillGrid( grid, i )
-			if check == True:
-				return True
+		nextCoord = LocateNextEmpty( grid )
+		nextX = nextCoord[0]
+		nextY = nextCoord[1]
+		if nextX == -1:
+			global solutions
+			solutions.append( grid )
+			return True
+		if len( psbGrid[nextX][nextY] ) > 0:
+			for psb in psbGrid[nextX][nextY]:
+				#print "%d: On the iteration %d..." % (val,i)
+				check = FillGrid( grid, psb )
+				if check == True:
+					return True
 	
-	#Nothing worked, just return false
+	#Nothing worked. Undo changes and just return false
+	psbGrid = copy.deepcopy( undoGrid )
 	grid[x][y] = 0
 	return False
 	
@@ -268,15 +358,25 @@ def FillGrid( grid, val ):
 #Add a stack per cell for possible values
 #	Same concepts as above apply but on a per cell basis
 #	Uses up way more memory, but should be faster for larger solutions
+#	Could also apply logic to these stacks
+#		Ex: block contains 2 cells in the same row/col that contain same value
+#		Remove other values in the same row/col
+#
+#Only add value if the stack size is 1, otherwise move on
+#TODO: Sort the lengths of arrays in psbGrid and select the next cell based on the shortest length found.
 ########################################
 #				MAIN
 ########################################
-BigTest()
+#BigTest()
 grid = ReadGridFromFile(sys.argv[1])
+psbGrid = CreatePsbGrid( grid )
+start = time.clock()
 FillGrid( grid, 0 )
+end = time.clock()
 count = 0
 for item in solutions:
 	count = count + 1
 	print "Solution %d:" % count
 	PrintGrid( item )
+print "Solutions found in: %f seconds" % (end - start)
 ########################################
