@@ -80,14 +80,13 @@ def CheckGridDimensions( grid ):
 def BlockToArray( grid, blockNum ):
 	xcoord = 0
 	ycoord = 0
-	gridSq = sqrt( len( grid ) )
+	gridSq = int(sqrt( len( grid ) ))
 	array = []
 	
-	ycoord = blockNum // gridSq * gridSq
-	xcoord = (blockNum % gridSq) * gridSq
-	
-	for y in range(ycoord, ycoord+gridSq):
-		for x in range(xcoord, xcoord+gridSq):
+	ycoord = int(blockNum // gridSq) * gridSq
+	xcoord = int(blockNum % gridSq) * gridSq
+	for y in range(ycoord, xcoord+gridSq):
+		for x in range(xcoord, ycoord+gridSq):
 			array.append( grid[y][x] )
 			
 	return array
