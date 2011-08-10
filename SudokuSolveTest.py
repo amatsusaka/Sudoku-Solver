@@ -1,9 +1,6 @@
 import unittest
 import SudokuSolve
 from math import sqrt
-import copy
-import sys
-import time
 
 ########################################
 #			Test Cases
