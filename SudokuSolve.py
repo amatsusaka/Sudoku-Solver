@@ -5,110 +5,231 @@ import copy
 import sys
 import time
 
-#File read file from grid
-def ReadGridFromFile( filename ):
-	f = open(filename,'r')
-	grid = []
-	currRow = 0
-	for line in f:
-		grid.append( [] )
-		values = line.split( ' ' )
-		for val in values:
-			if val != '\n':
-				valInt = int( val )
-				grid[currRow].append( valInt )
-		currRow = currRow + 1
-	return grid
-	
-#Checks a grid at certain coordinates and list its possibile values
-#RETURNS: list of possible values for coords
-def FindPsbs( grid, x, y ):
-	psbs = []
-	
-	col = ColToArray( grid, y )
-	block = BlockToArray( grid, LocateBlock( [x, y], sqrt( len( grid ) ) ) )
+class Solver:
 
-	for i in range( 1, len( grid ) + 1 ):
-		if i not in grid[x]:
-			if i not in col:
-				if i not in block:
-					psbs.append( i )
-	return psbs
+	#File read file from grid
+	def ReadGridFromFile( self, filename ):
+		f = open(filename,'r')
+		grid = []
+		currRow = 0
+		for line in f:
+			grid.append( [] )
+			values = line.split( ' ' )
+			for val in values:
+				if val != '\n':
+					valInt = int( val )
+					grid[currRow].append( valInt )
+			currRow = currRow + 1
+		return grid
+		
+	#Checks a grid at certain coordinates and list its possibile values
+	#RETURNS: list of possible values for coords
+	def FindPsbs( self, grid, x, y ):
+		psbs = []
+		
+		col = self.ColToArray( grid, y )
+		block = self.BlockToArray( grid, self.LocateBlock( [x, y], sqrt( len( grid ) ) ) )
 
-#Checks for duplicates within the array
-#RETURNS: False if row is valid
-def CheckArray( array ):
-	newArray = copy.deepcopy( array )
-	newArray.sort()
-	currVal = 0
-	valid = True
-	for val in newArray:
-		if val != 0:
-			if val == currVal:
-				valid = False
-			else:
-				currVal = val
-	return valid
+		for i in range( 1, len( grid ) + 1 ):
+			if i not in grid[x]:
+				if i not in col:
+					if i not in block:
+						psbs.append( i )
+		return psbs
 
-#Converts a specified column to an array
-#RETURNS: the column in array format
-def ColToArray( grid, colNum ):
-	if colNum < len( grid ):
-		array = []
-		for row in grid:
-			array.append( row[colNum] )
-		return array
+	#Checks for duplicates within the array
+	#RETURNS: False if row is valid
+	def CheckArray( self, array ):
+		newArray = copy.deepcopy( array )
+		newArray.sort()
+		currVal = 0
+		valid = True
+		for val in newArray:
+			if val != 0:
+				if val == currVal:
+					valid = False
+				else:
+					currVal = val
+		return valid
 
-#Validates the size of a given grid
-#Also checks if it is a 2D array
-#RETURNS: true if valid
-def CheckGridDimensions( grid ):
-	valid = False
-	
-	a = sqrt( len( grid ) )
-	
-	if len( grid ) > 0 and len( grid[0] ) > 0:
-		if a%1 == 0:
-			valid = True
-	else:
+	#Converts a specified column to an array
+	#RETURNS: the column in array format
+	def ColToArray( self, grid, colNum ):
+		if colNum < len( grid ):
+			array = []
+			for row in grid:
+				array.append( row[colNum] )
+			return array
+
+	#Validates the size of a given grid
+	#Also checks if it is a 2D array
+	#RETURNS: true if valid
+	def CheckGridDimensions( grid ):
 		valid = False
 		
-	return valid
-
-#Converts a block to an array
-#RETURNS: the block as an array
-def BlockToArray( grid, blockNum ):
-	xcoord = 0
-	ycoord = 0
-	gridSq = int(sqrt( len( grid ) ))
-	array = []
-	
-	ycoord = int(blockNum // gridSq) * gridSq
-	xcoord = int(blockNum % gridSq) * gridSq
-	for y in range(ycoord, xcoord+gridSq):
-		for x in range(xcoord, ycoord+gridSq):
-			array.append( grid[y][x] )
+		a = sqrt( len( grid ) )
+		
+		if len( grid ) > 0 and len( grid[0] ) > 0:
+			if a%1 == 0:
+				valid = True
+		else:
+			valid = False
 			
-	return array
+		return valid
 
-#Returns a location for a empty value
-def LocateNextEmpty( grid ):
-	x = 0
-	y = 0
-	for row in grid:
-		for val in row:
-			if val == 0:
-				return [x,y]
-			y = y + 1
-		x = x + 1
+	#Converts a block to an array
+	#RETURNS: the block as an array
+	def BlockToArray( self, grid, blockNum ):
+		xcoord = 0
+		ycoord = 0
+		gridSq = sqrt( len( grid ) )
+		array = []
+		
+		ycoord = blockNum // gridSq * gridSq
+		xcoord = (blockNum % gridSq) * gridSq
+		
+		for y in range(ycoord, ycoord+gridSq):
+			for x in range(xcoord, xcoord+gridSq):
+				array.append( grid[y][x] )
+				
+		return array
+
+	#Returns a location for a empty value
+	def LocateNextEmpty( self, grid ):
+		x = 0
 		y = 0
-	return [-1,0]
+		for row in grid:
+			for val in row:
+				if val == 0:
+					return [x,y]
+				y = y + 1
+			x = x + 1
+			y = 0
+		return [-1,0]
 
-#Calculates the block belonging to the coords
-def LocateBlock( coords, gridSq ):
-	x = coords[0] // gridSq
-	y = coords[1] // gridSq
-	return x * gridSq + y
+	#Calculates the block belonging to the coords
+	def LocateBlock( self, coords, gridSq ):
+		x = coords[0] // gridSq
+		y = coords[1] // gridSq
+		return x * gridSq + y
+
+	def PrintGrid( self, grid ):
+		linePrint = []
+		for k in range( 0, len( grid ) ):
+			linePrint.append( '-----' )
+			
+		for i in range( 0, len( grid ) ):
+			#print grid[i]
+			if i % sqrt( len( grid ) ) == 0:
+				print ''.join( linePrint )
+			self.CleanRowPrint( i, grid[i] )
+		print ''.join( linePrint )
+			
+	def CleanRowPrint( self, rowNum, array ):
+		cleanPrint = []
+		for i in range( 0, len( array ) ):
+			if i % sqrt( len( array ) ) == 0:
+				cleanPrint.append( "| " )
+			val = array[i]
+			if val > 9:
+				cleanPrint.append( str( val ) )
+			else:
+				cleanPrint.append( str( val ) )
+				cleanPrint.append( ' ' )
+		cleanPrint.append( "| " )
+		#print "%d: [ %s ]" % (rowNum, ' '.join( cleanPrint ) )
+		print ' '.join( cleanPrint )
+			
+	def ValidateGrid( self, grid, x, y ):
+		#Checking row
+		check = self.CheckArray( grid[x] )
+		
+		#Checking column
+		array = self.ColToArray( grid, y )
+		check = check & self.CheckArray( array )
+		
+		#Checking block
+		array = self.BlockToArray( grid, self.LocateBlock( [x, y], sqrt( len( grid ) ) ) )
+		check = check & self.CheckArray( array )
+		
+		return check
+
+	#Generates a grid that contains the possibilities
+	#for each cell
+	#RETURN: possibility grid
+	def CreatePsbGrid( self, grid ):
+		psb = []
+		for x in range( 0, len( grid ) ):
+			psb.append( [] )
+			for y in range( 0, len( grid ) ):
+				possibles = []
+				if grid[x][y] == 0:
+					possibles = self.FindPsbs( grid, x, y )
+				psb[x].append( possibles )
+		return psb
+
+	psbGrid = []
+
+	#Updates the possibility grid with the new value
+	def UpdatePsb( self, x, y, val ):
+		global psbGrid
+		
+		#print "Updating (%d, %d) with (%d)." % (x, y, val)
+		#CleanRowPrint( x, grid[x] )
+		
+		#cleaning out the filled cell
+		if val != 0:
+			psbGrid[x][y] = []
+		for cell in psbGrid[x]:
+			if val in cell:
+				cell.remove( val )
+				
+		column = self.ColToArray( psbGrid, y )
+		for cell in column:
+			if val in cell:
+				cell.remove( val )
+		
+		blockNum = self.LocateBlock( [x,y], sqrt( len( psbGrid ) ) )
+		block = self.BlockToArray( psbGrid, blockNum )
+		for cell in block:
+			if val in cell:
+				cell.remove( val )
+		
+		#print psbGrid
+
+	#Recursive function to fill grid
+	def FillGrid( self, grid, val ):
+		global psbGrid
+		
+		nextCoord = self.LocateNextEmpty( grid )
+		x = nextCoord[0]
+		y = nextCoord[1]
+			
+		grid[x][y] = val
+		undoGrid = copy.deepcopy( psbGrid )
+		self.UpdatePsb( x, y, val )
+		
+		check = self.ValidateGrid( grid, x, y )
+		if check == True:
+			nextCoord = self.LocateNextEmpty( grid )
+			nextX = nextCoord[0]
+			nextY = nextCoord[1]
+			if nextX == -1:
+				global solutions
+				solutions.append( grid )
+				return True
+			if len( psbGrid[nextX][nextY] ) > 0:
+				for psb in psbGrid[nextX][nextY]:
+					#print "%d: On the iteration %d..." % (val,i)
+					check = self.FillGrid( grid, psb )
+					if check == True:
+						return True
+		
+		#Nothing worked. Undo changes and just return false
+		psbGrid = copy.deepcopy( undoGrid )
+		grid[x][y] = 0
+		return False
+	
 	
 ########################################
 #			Test Cases
@@ -205,7 +326,7 @@ def TestLocateNextEmpty():
 def TestLocateBlock():
 	failed = True
 	grid = ReadGridFromFile('TestCase1.txt')
-	val = LocateBlock( [0,3], sqrt( len( grid ) ) )
+	val = self.LocateBlock( [0,3], sqrt( len( grid ) ) )
 	if val == 1:
 		failed = False
 	return failed
@@ -231,124 +352,7 @@ def BigTest():
 		a = a + 1
 ########################################
 
-def PrintGrid( grid ):
-	linePrint = []
-	for k in range( 0, len( grid ) ):
-		linePrint.append( '-----' )
-		
-	for i in range( 0, len( grid ) ):
-		#print grid[i]
-		if i % sqrt( len( grid ) ) == 0:
-			print ''.join( linePrint )
-		CleanRowPrint( i, grid[i] )
-	print ''.join( linePrint )
-		
-def CleanRowPrint( rowNum, array ):
-	cleanPrint = []
-	for i in range( 0, len( array ) ):
-		if i % sqrt( len( array ) ) == 0:
-			cleanPrint.append( "| " )
-		val = array[i]
-		if val > 9:
-			cleanPrint.append( str( val ) )
-		else:
-			cleanPrint.append( str( val ) )
-			cleanPrint.append( ' ' )
-	cleanPrint.append( "| " )
-	#print "%d: [ %s ]" % (rowNum, ' '.join( cleanPrint ) )
-	print ' '.join( cleanPrint )
-		
-def ValidateGrid( grid, x, y ):
-	#Checking row
-	check = CheckArray( grid[x] )
-	
-	#Checking column
-	array = ColToArray( grid, y )
-	check = check & CheckArray( array )
-	
-	#Checking block
-	array = BlockToArray( grid, LocateBlock( [x, y], sqrt( len( grid ) ) ) )
-	check = check & CheckArray( array )
-	
-	return check
 
-#Generates a grid that contains the possibilities
-#for each cell
-#RETURN: possibility grid
-def CreatePsbGrid( grid ):
-	psb = []
-	for x in range( 0, len( grid ) ):
-		psb.append( [] )
-		for y in range( 0, len( grid ) ):
-			possibles = []
-			if grid[x][y] == 0:
-				possibles = FindPsbs( grid, x, y )
-			psb[x].append( possibles )
-	return psb
-
-psbGrid = []
-solutions = []
-
-#Updates the possibility grid with the new value
-def UpdatePsb( x, y, val ):
-	global psbGrid
-	
-	#print "Updating (%d, %d) with (%d)." % (x, y, val)
-	#CleanRowPrint( x, grid[x] )
-	
-	#cleaning out the filled cell
-	if val != 0:
-		psbGrid[x][y] = []
-	for cell in psbGrid[x]:
-		if val in cell:
-			cell.remove( val )
-			
-	column = ColToArray( psbGrid, y )
-	for cell in column:
-		if val in cell:
-			cell.remove( val )
-	
-	blockNum = LocateBlock( [x,y], sqrt( len( psbGrid ) ) )
-	block = BlockToArray( psbGrid, blockNum )
-	for cell in block:
-		if val in cell:
-			cell.remove( val )
-	
-	#print psbGrid
-
-#Recursive function to fill grid
-def FillGrid( grid, val ):
-	global psbGrid
-	
-	nextCoord = LocateNextEmpty( grid )
-	x = nextCoord[0]
-	y = nextCoord[1]
-		
-	grid[x][y] = val
-	undoGrid = copy.deepcopy( psbGrid )
-	UpdatePsb( x, y, val )
-	
-	check = ValidateGrid( grid, x, y )
-	if check == True:
-		nextCoord = LocateNextEmpty( grid )
-		nextX = nextCoord[0]
-		nextY = nextCoord[1]
-		if nextX == -1:
-			global solutions
-			solutions.append( grid )
-			return True
-		if len( psbGrid[nextX][nextY] ) > 0:
-			for psb in psbGrid[nextX][nextY]:
-				#print "%d: On the iteration %d..." % (val,i)
-				check = FillGrid( grid, psb )
-				if check == True:
-					return True
-	
-	#Nothing worked. Undo changes and just return false
-	psbGrid = copy.deepcopy( undoGrid )
-	grid[x][y] = 0
-	return False
-	
 #Find the most common value and choose to solve that next
 #Add pointers to the end of each row/col to maintain stacks of values possible
 #	Each time you add a value to the row/col, remove from stack
@@ -367,15 +371,23 @@ def FillGrid( grid, val ):
 #				MAIN
 ########################################
 #BigTest()
-grid = ReadGridFromFile(sys.argv[1])
-psbGrid = CreatePsbGrid( grid )
-start = time.clock()
-FillGrid( grid, 0 )
-end = time.clock()
-count = 0
-for item in solutions:
-	count = count + 1
-	print "Solution %d:" % count
-	PrintGrid( item )
-print "Solutions found in: %f seconds" % (end - start)
+def main():
+	start = time.clock()
+	mySolver.FillGrid( grid, 0 )
+	end = time.clock()
+	count = 0
+	for item in solutions:
+		count = count + 1
+		print "Solution %d:" % count
+		mySolver.PrintGrid( item )
+	print "Solutions found in: %f seconds" % (end - start)
+
+if __name__ == '__main__': 
+	mySolver = Solver()
+	solutions = []
+	myFile = sys.argv[1]
+	print myFile
+	grid = mySolver.ReadGridFromFile(myFile)
+	psbGrid = mySolver.CreatePsbGrid( grid )
+	main() 
 ########################################
