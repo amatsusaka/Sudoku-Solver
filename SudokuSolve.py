@@ -64,7 +64,7 @@ class Solver:
 	#Validates the size of a given grid
 	#Also checks if it is a 2D array
 	#RETURNS: true if valid
-	def CheckGridDimensions( grid ):
+	def CheckGridDimensions( this, grid ):
 		valid = False
 		
 		a = sqrt( len( grid ) )
