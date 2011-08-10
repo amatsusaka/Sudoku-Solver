@@ -26,7 +26,7 @@ class TestStuff(unittest.TestCase):
 		else:
 			failed = True
 			
-		return failed
+		self.assertFalse(failed)
 
 	def test_ColToArray(self):
 		#print "Testing column to array..."
@@ -46,7 +46,7 @@ class TestStuff(unittest.TestCase):
 		if array == checkArray:
 			failed = False
 			
-		return failed
+		self.assertFalse(failed)
 
 	def test_CheckGridDimensions(self):
 		#print "Testing grid validation..."
@@ -64,7 +64,7 @@ class TestStuff(unittest.TestCase):
 		if valid == False:
 			failed = False
 			
-		return failed
+		self.assertFalse(failed)
 		
 	def test_BlockToArray(self):
 		#print "Testing blcok to array..."
@@ -83,7 +83,7 @@ class TestStuff(unittest.TestCase):
 		if array == checkArray:
 			failed = False
 			
-		return failed
+		self.assertFalse(failed)
 		
 	def test_LocateNextEmpty(self):
 		failed = True
@@ -96,7 +96,7 @@ class TestStuff(unittest.TestCase):
 		val = self.mySolver.LocateNextEmpty( a )
 		if val == [2,2]:
 			failed = False
-		return failed
+		self.assertFalse(failed)
 		
 	def test_LocateBlock(self):
 		failed = True
@@ -104,7 +104,7 @@ class TestStuff(unittest.TestCase):
 		val = self.mySolver.LocateBlock( [0,3], sqrt( len( grid ) ) )
 		if val == 1:
 			failed = False
-		return failed
+		self.assertFalse(failed)
 		
 if __name__ == '__main__':
 	unittest.main()
