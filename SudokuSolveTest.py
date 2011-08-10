@@ -14,19 +14,8 @@ class TestStuff(unittest.TestCase):
 		a = [4, 8, 9, 2, 1, 3] #should pass
 		b = [8, 8, 2, 1, 3, 9] #should fail
 		
-		failed = True
-		
-		if self.mySolver.CheckArray( a ) == True:
-			failed = False
-		else:
-			failed = True
-			
-		if self.mySolver.CheckArray( b ) == False:
-			failed = False
-		else:
-			failed = True
-			
-		self.assertFalse(failed)
+		self.assertTrue( self.mySolver.CheckArray( a ) )
+		self.assertFalse( self.mySolver.CheckArray( b ) )
 
 	def test_ColToArray(self):
 		#print "Testing column to array..."
@@ -39,14 +28,9 @@ class TestStuff(unittest.TestCase):
 			]
 		checkArray = [1, 6, 11, 16, 21]
 		
-		failed = True
-		
 		array = self.mySolver.ColToArray( a, 0 )
-		
-		if array == checkArray:
-			failed = False
 			
-		self.assertFalse(failed)
+		self.assertTrue(array == checkArray)
 
 	def test_CheckGridDimensions(self):
 		#print "Testing grid validation..."
@@ -58,13 +42,7 @@ class TestStuff(unittest.TestCase):
 			[21, 22, 23, 24, 25]
 			]
 			
-		failed = True
-		
-		valid = self.mySolver.CheckGridDimensions( a )
-		if valid == False:
-			failed = False
-			
-		self.assertFalse(failed)
+		self.assertFalse( self.mySolver.CheckGridDimensions( a ) )
 		
 	def test_BlockToArray(self):
 		#print "Testing blcok to array..."
@@ -76,14 +54,9 @@ class TestStuff(unittest.TestCase):
 			]
 		checkArray = [3, 4, 7, 8]
 		
-		failed = True
-		
 		array = self.mySolver.BlockToArray( a, 1 )
-		
-		if array == checkArray:
-			failed = False
-			
-		self.assertFalse(failed)
+
+		self.assertTrue(array == checkArray)
 		
 	def test_LocateNextEmpty(self):
 		failed = True
@@ -94,17 +67,15 @@ class TestStuff(unittest.TestCase):
 			[13, 14, 15, 16]
 			]
 		val = self.mySolver.LocateNextEmpty( a )
-		if val == [2,2]:
-			failed = False
-		self.assertFalse(failed)
+
+		self.assertTrue( val == [2,2] )
 		
 	def test_LocateBlock(self):
 		failed = True
 		grid = self.mySolver.ReadGridFromFile('TestCase1.txt')
 		val = self.mySolver.LocateBlock( [0,3], sqrt( len( grid ) ) )
-		if val == 1:
-			failed = False
-		self.assertFalse(failed)
+
+		self.assertTrue( val == 1 )
 		
 if __name__ == '__main__':
 	unittest.main()
