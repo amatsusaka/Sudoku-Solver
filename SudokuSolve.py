@@ -64,16 +64,13 @@ class Solver:
 	#Validates the size of a given grid
 	#Also checks if it is a 2D array
 	#RETURNS: true if valid
-	def CheckGridDimensions( this, grid ):
+	def CheckGridDimensions( self, grid ):
 		valid = False
 		
 		a = sqrt( len( grid ) )
-		
-		if len( grid ) > 0 and len( grid[0] ) > 0:
-			if a%1 == 0:
+
+		if len( grid ) > 0 and len( grid[0] ) > 0 and a%1 == 0:
 				valid = True
-		else:
-			valid = False
 			
 		return valid
 
