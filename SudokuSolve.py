@@ -7,6 +7,18 @@ import time
 
 class Solver:
 
+	def __init__( self, sodukuFile='' ):
+		self.solutions = []
+		self.grid = []
+		self.psbGrid = []
+		if(sodukuFile!=''):
+			self.grid = self.ReadGridFromFile( sodukuFile )
+			self.psbGrid = self.CreatePsbGrid( self.grid )
+		
+	def solve(self):
+		self.FillGrid( self.grid, 0 )
+		return self.solutions
+		
 	#File read file from grid
 	def ReadGridFromFile( self, filename ):
 		f = open(filename,'r')
@@ -165,29 +177,25 @@ class Solver:
 				psb[x].append( possibles )
 		return psb
 
-	psbGrid = []
-
 	#Updates the possibility grid with the new value
 	def UpdatePsb( self, x, y, val ):
-		global psbGrid
-		
 		#print "Updating (%d, %d) with (%d)." % (x, y, val)
 		#CleanRowPrint( x, grid[x] )
 		
 		#cleaning out the filled cell
 		if val != 0:
-			psbGrid[x][y] = []
-		for cell in psbGrid[x]:
+			self.psbGrid[x][y] = []
+		for cell in self.psbGrid[x]:
 			if val in cell:
 				cell.remove( val )
 				
-		column = self.ColToArray( psbGrid, y )
+		column = self.ColToArray( self.psbGrid, y )
 		for cell in column:
 			if val in cell:
 				cell.remove( val )
 		
-		blockNum = self.LocateBlock( [x,y], sqrt( len( psbGrid ) ) )
-		block = self.BlockToArray( psbGrid, blockNum )
+		blockNum = self.LocateBlock( [x,y], sqrt( len( self.psbGrid ) ) )
+		block = self.BlockToArray( self.psbGrid, blockNum )
 		for cell in block:
 			if val in cell:
 				cell.remove( val )
@@ -196,14 +204,12 @@ class Solver:
 
 	#Recursive function to fill grid
 	def FillGrid( self, grid, val ):
-		global psbGrid
-		
 		nextCoord = self.LocateNextEmpty( grid )
 		x = nextCoord[0]
 		y = nextCoord[1]
 			
 		grid[x][y] = val
-		undoGrid = copy.deepcopy( psbGrid )
+		undoGrid = copy.deepcopy( self.psbGrid )
 		self.UpdatePsb( x, y, val )
 		
 		check = self.ValidateGrid( grid, x, y )
@@ -212,18 +218,17 @@ class Solver:
 			nextX = nextCoord[0]
 			nextY = nextCoord[1]
 			if nextX == -1:
-				global solutions
-				solutions.append( grid )
+				self.solutions.append( grid )
 				return True
-			if len( psbGrid[nextX][nextY] ) > 0:
-				for psb in psbGrid[nextX][nextY]:
+			if len( self.psbGrid[nextX][nextY] ) > 0:
+				for psb in self.psbGrid[nextX][nextY]:
 					#print "%d: On the iteration %d..." % (val,i)
 					check = self.FillGrid( grid, psb )
 					if check == True:
 						return True
 		
 		#Nothing worked. Undo changes and just return false
-		psbGrid = copy.deepcopy( undoGrid )
+		self.psbGrid = copy.deepcopy( undoGrid )
 		grid[x][y] = 0
 		return False
 
@@ -246,8 +251,10 @@ class Solver:
 ########################################
 
 def main():
+	sudokuFile = sys.argv[1]
+	mySolver = Solver(sudokuFile)
 	start = time.clock()
-	mySolver.FillGrid( grid, 0 )
+	solutions = mySolver.solve()
 	end = time.clock()
 	count = 0
 	for item in solutions:
@@ -257,11 +264,5 @@ def main():
 	print "Solutions found in: %f seconds" % (end - start)
 
 if __name__ == '__main__': 
-	mySolver = Solver()
-	solutions = []
-	myFile = sys.argv[1]
-	print myFile
-	grid = mySolver.ReadGridFromFile(myFile)
-	psbGrid = mySolver.CreatePsbGrid( grid )
 	main() 
 ########################################

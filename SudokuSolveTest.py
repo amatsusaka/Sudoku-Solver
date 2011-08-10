@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import unittest
 import SudokuSolve
 from math import sqrt
