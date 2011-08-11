@@ -15,7 +15,7 @@ class Solver:
 			self.grid = self.ReadGridFromFile( sodukuFile )
 			self.psbGrid = self.CreatePsbGrid( self.grid )
 		
-	def solve(self):
+	def Solve(self):
 		self.FillGrid( self.grid, 0 )
 		return self.solutions
 		

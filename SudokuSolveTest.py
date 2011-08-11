@@ -11,6 +11,15 @@ class TestStuff(unittest.TestCase):
 	def setUp(self):
 		self.mySolver = SudokuSolve.Solver()
 	
+	def test_Solve(self):
+		self.assertTrue(false) #TODO make this work
+		
+	def test_ReadGridFromFile(self):
+		self.assertTrue(false) #TODO make this work
+	
+	def test_FindPsbs(self):
+		self.assertTrue(false) #TODO make this work
+	
 	def test_CheckArray(self):
 		#print "Testing array check..."
 		grid_1 = [4, 8, 9, 2, 1, 3] #should pass
@@ -88,6 +97,24 @@ class TestStuff(unittest.TestCase):
 		val = self.mySolver.LocateBlock( [0,3], sqrt( len( grid ) ) )
 
 		self.assertTrue( val == 1 )
+		
+	def test_PrintGrid(self):
+		self.assertTrue(false) #TODO: make this work
+		
+	def test_CleanRowPrint(self):
+		self.assertTrue(false) #TODO: make this work
+		
+	def test_ValidateGrid(self):
+		self.assertTrue(false) #TODO: make this work
+		
+	def test_CreatePsbGrid(self):
+		self.assertTrue(false) #TODO: make this work
+		
+	def test_UpdatePsb(self):
+		self.assertTrue(false) #TODO: make this work
+		
+	def test_FillGrid(self):
+		self.assertTrue(false) #TODO: make this work
 		
 if __name__ == '__main__':
 	unittest.main()
