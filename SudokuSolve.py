@@ -251,9 +251,9 @@ class Solver:
 ########################################
 
 def main():
-        if len(sys.argv) != 2:
-                sys.exit("Please specify an input file.")
-        sudokuFile = sys.argv[1]
+	if len(sys.argv) != 2:
+		sys.exit("Please specify an input file.")
+	sudokuFile = sys.argv[1]
 	mySolver = Solver(sudokuFile)
 	start = time.clock()
 	solutions = mySolver.Solve()
