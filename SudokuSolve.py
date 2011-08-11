@@ -13,21 +13,24 @@ class Solver:
 		self.psbGrid = []
 		if(sodukuFile!=''):
 			self.SetGrid( self.ReadGridFromFile( sodukuFile ) )
-		
+
 	def Solve( self ):
 		self.FillGrid( self.grid, 0 )
 		return self.solutions
-	
+
 	def SetGrid( self, grid_in ):
 		self.grid = grid_in
 		self.psbGrid = self.CreatePsbGrid( self.grid )
-	
 	def GetGrid( self ):
 		return self.grid
-	
+
 	#File read file from grid
 	def ReadGridFromFile( self, filename ):
-		f = open(filename,'r')
+		try:
+			f = open(filename,'r')
+		except IOError, failure:
+			print failure
+			sys.exit()
 		grid = []
 		currRow = 0
 		for line in f:
@@ -38,13 +41,17 @@ class Solver:
 					valInt = int( val )
 					grid[currRow].append( valInt )
 			currRow = currRow + 1
+		dimension = float(currRow)/float(len(values))
+		if dimension != 1.0:
+			print "Invalid grid dimensions"
+			sys.exit()
 		return grid
-		
+
 	#Checks a grid at certain coordinates and list its possibile values
 	#RETURNS: list of possible values for coords
 	def FindPsbs( self, grid, x, y ):
 		psbs = []
-		
+
 		col = self.ColToArray( grid, y )
 		block = self.BlockToArray( grid, self.LocateBlock( [x, y], sqrt( len( grid ) ) ) )
 
@@ -84,12 +91,12 @@ class Solver:
 	#RETURNS: true if valid
 	def CheckGridDimensions( self, grid ):
 		valid = False
-		
+
 		a = sqrt( len( grid ) )
 
 		if len( grid ) > 0 and len( grid[0] ) > 0 and a%1 == 0:
 				valid = True
-			
+
 		return valid
 
 	#Converts a block to an array
@@ -99,14 +106,14 @@ class Solver:
 		ycoord = 0
 		gridSq = int(sqrt( len( grid ) ))
 		array = []
-		
+
 		ycoord = int(blockNum // gridSq) * gridSq
 		xcoord = int(blockNum % gridSq) * gridSq
-		
+
 		for y in range(ycoord, ycoord+gridSq):
 			for x in range(xcoord, xcoord+gridSq):
 				array.append( grid[y][x] )
-				
+
 		return array
 
 	#Returns a location for a empty value
@@ -132,14 +139,14 @@ class Solver:
 		linePrint = []
 		for k in range( 0, len( grid ) ):
 			linePrint.append( '-----' )
-			
+
 		for i in range( 0, len( grid ) ):
 			#print grid[i]
 			if i % sqrt( len( grid ) ) == 0:
 				print ''.join( linePrint )
 			self.CleanRowPrint( i, grid[i] )
 		print ''.join( linePrint )
-			
+
 	def CleanRowPrint( self, rowNum, array ):
 		cleanPrint = []
 		for i in range( 0, len( array ) ):
@@ -154,19 +161,19 @@ class Solver:
 		cleanPrint.append( "| " )
 		#print "%d: [ %s ]" % (rowNum, ' '.join( cleanPrint ) )
 		print ' '.join( cleanPrint )
-			
+
 	def ValidateGrid( self, grid, x, y ):
 		#Checking row
 		check = self.CheckArray( grid[x] )
-		
+
 		#Checking column
 		array = self.ColToArray( grid, y )
 		check = check & self.CheckArray( array )
-		
+
 		#Checking block
 		array = self.BlockToArray( grid, self.LocateBlock( [x, y], sqrt( len( grid ) ) ) )
 		check = check & self.CheckArray( array )
-		
+
 		return check
 
 	#Generates a grid that contains the possibilities
@@ -187,25 +194,25 @@ class Solver:
 	def UpdatePsb( self, x, y, val ):
 		#print "Updating (%d, %d) with (%d)." % (x, y, val)
 		#CleanRowPrint( x, grid[x] )
-		
+
 		#cleaning out the filled cell
 		if val != 0:
 			self.psbGrid[x][y] = []
 		for cell in self.psbGrid[x]:
 			if val in cell:
 				cell.remove( val )
-				
+
 		column = self.ColToArray( self.psbGrid, y )
 		for cell in column:
 			if val in cell:
 				cell.remove( val )
-		
+
 		blockNum = self.LocateBlock( [x,y], sqrt( len( self.psbGrid ) ) )
 		block = self.BlockToArray( self.psbGrid, blockNum )
 		for cell in block:
 			if val in cell:
 				cell.remove( val )
-		
+
 		#print psbGrid
 
 	#Recursive function to fill grid
@@ -213,11 +220,11 @@ class Solver:
 		nextCoord = self.LocateNextEmpty( grid )
 		x = nextCoord[0]
 		y = nextCoord[1]
-			
+
 		grid[x][y] = val
 		undoGrid = copy.deepcopy( self.psbGrid )
 		self.UpdatePsb( x, y, val )
-		
+
 		check = self.ValidateGrid( grid, x, y )
 		if check == True:
 			nextCoord = self.LocateNextEmpty( grid )
@@ -232,7 +239,7 @@ class Solver:
 					check = self.FillGrid( grid, psb )
 					if check == True:
 						return True
-		
+
 		#Nothing worked. Undo changes and just return false
 		self.psbGrid = copy.deepcopy( undoGrid )
 		grid[x][y] = 0
@@ -271,6 +278,7 @@ def main():
 		mySolver.PrintGrid( item )
 	print "Solutions found in: %f seconds" % (end - start)
 
-if __name__ == '__main__': 
-	main() 
+if __name__ == '__main__':
+	main()
 ########################################
+
