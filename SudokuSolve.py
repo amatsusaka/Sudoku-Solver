@@ -256,7 +256,7 @@ def main():
         sudokuFile = sys.argv[1]
 	mySolver = Solver(sudokuFile)
 	start = time.clock()
-	solutions = mySolver.solve()
+	solutions = mySolver.Solve()
 	end = time.clock()
 	count = 0
 	for item in solutions:
