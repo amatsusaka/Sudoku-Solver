@@ -12,13 +12,19 @@ class Solver:
 		self.grid = []
 		self.psbGrid = []
 		if(sodukuFile!=''):
-			self.grid = self.ReadGridFromFile( sodukuFile )
-			self.psbGrid = self.CreatePsbGrid( self.grid )
+			self.SetGrid( self.ReadGridFromFile( sodukuFile ) )
 		
-	def Solve(self):
+	def Solve( self ):
 		self.FillGrid( self.grid, 0 )
 		return self.solutions
-		
+	
+	def SetGrid( self, grid_in ):
+		self.grid = grid_in
+		self.psbGrid = self.CreatePsbGrid( self.grid )
+	
+	def GetGrid( self ):
+		return self.grid
+	
 	#File read file from grid
 	def ReadGridFromFile( self, filename ):
 		f = open(filename,'r')

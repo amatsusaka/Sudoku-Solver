@@ -12,13 +12,41 @@ class TestStuff(unittest.TestCase):
 		self.mySolver = SudokuSolve.Solver()
 	
 	def test_Solve(self):
-		self.assertTrue(false) #TODO make this work
+		grid = [
+			[1, 2, 0, 4], 
+			[3, 0, 0, 2], 
+			[0, 0, 0, 0], 
+			[2, 1, 0, 3]
+			]
+		solution = [[
+			[1, 2, 3, 4], 
+			[3, 4, 1, 2], 
+			[4, 3, 2, 1], 
+			[2, 1, 4, 3]
+			]]
+		self.mySolver.SetGrid(grid)
+		result = self.mySolver.Solve()
+		self.assertEquals(result, solution) #TODO make this work
+		
+	def test_SetGrid(self):
+		grid = [
+			[1, 2, 3, 4, 5],
+			[6, 7, 8, 9, 10],
+			[11, 12, 13, 14, 15],
+			[16, 17, 18, 19, 20],
+			[21, 22, 23, 24, 25]
+			]
+		self.mySolver.SetGrid(grid)
+		self.assertEquals(self.mySolver.GetGrid(), grid) #TODO make this work
+		
+	def test_GetGrid(self):
+		self.assertTrue(False) #TODO make this work
 		
 	def test_ReadGridFromFile(self):
-		self.assertTrue(false) #TODO make this work
+		self.assertTrue(False) #TODO make this work
 	
 	def test_FindPsbs(self):
-		self.assertTrue(false) #TODO make this work
+		self.assertTrue(False) #TODO make this work
 	
 	def test_CheckArray(self):
 		#print "Testing array check..."
@@ -99,22 +127,22 @@ class TestStuff(unittest.TestCase):
 		self.assertTrue( val == 1 )
 		
 	def test_PrintGrid(self):
-		self.assertTrue(false) #TODO: make this work
+		self.assertTrue(False) #TODO: make this work
 		
 	def test_CleanRowPrint(self):
-		self.assertTrue(false) #TODO: make this work
+		self.assertTrue(False) #TODO: make this work
 		
 	def test_ValidateGrid(self):
-		self.assertTrue(false) #TODO: make this work
+		self.assertTrue(False) #TODO: make this work
 		
 	def test_CreatePsbGrid(self):
-		self.assertTrue(false) #TODO: make this work
+		self.assertTrue(False) #TODO: make this work
 		
 	def test_UpdatePsb(self):
-		self.assertTrue(false) #TODO: make this work
+		self.assertTrue(False) #TODO: make this work
 		
 	def test_FillGrid(self):
-		self.assertTrue(false) #TODO: make this work
+		self.assertTrue(False) #TODO: make this work
 		
 if __name__ == '__main__':
 	unittest.main()
