@@ -208,13 +208,58 @@ class TestStuff(unittest.TestCase):
 		#TODO: write tests for other bad grid permutations
 		
 	def test_CreatePsbGrid(self):
-		self.assertTrue(False) #TODO: make this work
+		grid = [
+			[1, 2, 0, 4], 
+			[3, 0, 0, 2], 
+			[0, 0, 0, 0], 
+			[2, 1, 0, 3]
+			]
+		actual = self.mySolver.CreatePsbGrid(grid)
+		expected = [[[], [], [3], []], [[], [4], [1], []], [[4], [3, 4], [1, 2, 4], [1]], [[], [], [4], []]]
+
+		self.assertEquals(actual, expected)
 		
 	def test_UpdatePsb(self):
-		self.assertTrue(False) #TODO: make this work
+		grid = [
+			[1, 2, 0, 4], 
+			[3, 0, 0, 2], 
+			[0, 0, 0, 0], 
+			[2, 1, 0, 3]
+			]
+		self.mySolver.SetGrid(grid)
+		self.mySolver.UpdatePsb(1,1,4)
+		actual = self.mySolver.psbGrid
+		expected = [[[], [], [3], []], [[], [], [1], []], [[4], [3], [1, 2, 4], [1]], [[], [], [4], []]]
+
+		self.assertEquals(actual, expected)
 		
 	def test_FillGrid(self):
-		self.assertTrue(False) #TODO: make this work
+		# ensure a True value is returned when solving a grid
+		good_grid = [
+			[1, 2, 0, 4], 
+			[3, 0, 0, 2], 
+			[0, 0, 0, 0], 
+			[2, 1, 0, 3]
+			]
+		self.mySolver.SetGrid(good_grid)
+		actual = self.mySolver.FillGrid(good_grid,0)
+		self.assertTrue(actual)
+		
+		# ensure grid was filled correctly
+		expected = [[1, 2, 3, 4], [3, 4, 1, 2], [4, 3, 2, 1], [2, 1, 4, 3]]
+		actual = self.mySolver.GetGrid()
+		self.assertEquals(actual, expected)
+		
+		# ensure a False value is returned when a grid is unsolvable
+		bad_grid = [
+			[1, 2, 2, 4], 
+			[3, 0, 0, 2], 
+			[1, 1, 0, 4], 
+			[2, 1, 1, 3]
+			]
+		self.mySolver.SetGrid(bad_grid)
+		actual = self.mySolver.FillGrid(bad_grid,0)
+		self.assertFalse(actual)
 		
 if __name__ == '__main__':
 	unittest.main()
