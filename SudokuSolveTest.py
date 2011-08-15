@@ -3,6 +3,8 @@
 import unittest
 import SudokuSolve
 from math import sqrt
+from cStringIO import StringIO
+import sys
 
 ########################################
 #			Test Cases
@@ -10,7 +12,7 @@ from math import sqrt
 class TestStuff(unittest.TestCase):
 	def setUp(self):
 		self.mySolver = SudokuSolve.Solver()
-	
+
 	def test_Solve(self):
 		grid = [
 			[1, 2, 0, 4], 
@@ -18,35 +20,62 @@ class TestStuff(unittest.TestCase):
 			[0, 0, 0, 0], 
 			[2, 1, 0, 3]
 			]
-		solution = [[
+		expected = [[
 			[1, 2, 3, 4], 
 			[3, 4, 1, 2], 
 			[4, 3, 2, 1], 
 			[2, 1, 4, 3]
 			]]
 		self.mySolver.SetGrid(grid)
-		result = self.mySolver.Solve()
-		self.assertEquals(result, solution) #TODO make this work
+		actual = self.mySolver.Solve()
+		self.assertEquals(actual, expected)
 		
 	def test_SetGrid(self):
-		grid = [
+		expected = [
 			[1, 2, 3, 4, 5],
 			[6, 7, 8, 9, 10],
 			[11, 12, 13, 14, 15],
 			[16, 17, 18, 19, 20],
 			[21, 22, 23, 24, 25]
 			]
-		self.mySolver.SetGrid(grid)
-		self.assertEquals(self.mySolver.GetGrid(), grid) #TODO make this work
+		self.mySolver.SetGrid(expected)
+		actual = self.mySolver.GetGrid()
+		self.assertEquals(actual, expected)
 		
 	def test_GetGrid(self):
-		self.assertTrue(False) #TODO make this work
+		expected = [
+			[1, 2, 3, 4, 5],
+			[6, 7, 8, 9, 10],
+			[11, 12, 13, 14, 15],
+			[16, 17, 18, 19, 20],
+			[21, 22, 23, 24, 25]
+			]
+		self.mySolver.SetGrid(expected)
+		actual = self.mySolver.GetGrid()
+		self.assertEquals(actual, expected)
 		
 	def test_ReadGridFromFile(self):
-		self.assertTrue(False) #TODO make this work
+		expected = [
+			[1, 2, 0, 4],
+			[3, 0, 0, 2],
+			[0, 0, 0, 0],
+			[2, 1, 0, 3]]
+		actual = self.mySolver.ReadGridFromFile("TestCase1.txt")
+		self.assertEquals(expected, actual)
 	
 	def test_FindPsbs(self):
-		self.assertTrue(False) #TODO make this work
+		grid = [
+			[1, 2, 0, 4], 
+			[3, 0, 0, 2], 
+			[0, 0, 0, 0], 
+			[2, 1, 0, 3]
+			]
+
+		expected = [1, 2, 4]
+		
+		actual = self.mySolver.FindPsbs(grid, 2, 2)
+
+		self.assertEquals(actual, expected)
 	
 	def test_CheckArray(self):
 		#print "Testing array check..."
@@ -69,7 +98,7 @@ class TestStuff(unittest.TestCase):
 		
 		array = self.mySolver.ColToArray( grid, 0 )
 			
-		self.assertTrue(array == checkArray)
+		self.assertEquals(array, checkArray)
 
 	def test_CheckGridDimensions(self):
 		#print "Testing grid validation..."
@@ -98,11 +127,11 @@ class TestStuff(unittest.TestCase):
 			[9, 10, 11, 12],
 			[13, 14, 15, 16]
 			]
-		checkArray = [3, 4, 7, 8]
+		expected = [3, 4, 7, 8]
 		
-		array = self.mySolver.BlockToArray( grid, 1 )
+		actual = self.mySolver.BlockToArray( grid, 1 )
 
-		self.assertTrue(array == checkArray)
+		self.assertEquals(actual, expected)
 		
 	def test_LocateNextEmpty(self):
 		grid = [
@@ -113,7 +142,7 @@ class TestStuff(unittest.TestCase):
 			]
 		val = self.mySolver.LocateNextEmpty( grid )
 
-		self.assertTrue( val == [2,2] )
+		self.assertEquals( val, [2,2] )
 		
 	def test_LocateBlock(self):
 		grid = [
@@ -124,16 +153,59 @@ class TestStuff(unittest.TestCase):
 			]
 		val = self.mySolver.LocateBlock( [0,3], sqrt( len( grid ) ) )
 
-		self.assertTrue( val == 1 )
+		self.assertEquals( val, 1 )
 		
 	def test_PrintGrid(self):
-		self.assertTrue(False) #TODO: make this work
+		grid = [
+			[1, 2],
+			[2, 1]
+			]
+		expected = "----------\n|  1   2   | \n|  2   1   | \n----------\n"
+		
+		# re-route print() output to a string instead
+		stdout_saved, sys.stdout = sys.stdout, StringIO()
+		self.mySolver.PrintGrid( grid );
+		
+		# get printed value, reset stdout
+		actual = sys.stdout.getvalue()
+		sys.stdout = stdout_saved
+		
+		self.assertEqual(actual, expected)
 		
 	def test_CleanRowPrint(self):
-		self.assertTrue(False) #TODO: make this work
+		grid_row = [1, 2]
+		expected = "|  1   2   | \n"
+		
+		# re-route print() output to a string instead
+		stdout_saved, sys.stdout = sys.stdout, StringIO()
+		self.mySolver.CleanRowPrint(0, grid_row)
+		
+		# get printed value, reset stdout
+		actual = sys.stdout.getvalue()
+		sys.stdout = stdout_saved
+		
+		self.assertEqual(actual, expected)
 		
 	def test_ValidateGrid(self):
-		self.assertTrue(False) #TODO: make this work
+		good_grid = [
+			[1, 2, 0, 4], 
+			[3, 0, 0, 2], 
+			[0, 0, 0, 0], 
+			[2, 1, 0, 3]
+			]
+		bad_grid = [
+			[2, 0, 4], 
+			[3, 0, 0, 2], 
+			[0, 0, 0, 0], 
+			[2, 1, 0, 3]
+			]
+		actual = self.mySolver.ValidateGrid( good_grid, 1, 1 )
+		self.assertTrue(actual)
+		
+		actual = self.mySolver.ValidateGrid( bad_grid, 0, 0 )
+		self.assertFalse(actual)
+		
+		#TODO: write tests for other bad grid permutations
 		
 	def test_CreatePsbGrid(self):
 		self.assertTrue(False) #TODO: make this work
